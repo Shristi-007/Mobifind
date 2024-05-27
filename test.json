@@ -1,0 +1,18 @@
+{
+  "test": "benchmark",
+  "benchmark": {
+    "name": "MyContractBenchmark",
+    "description": "Benchmarking MyContract on Ethereum",
+    "contracts": {
+      "myContract": {
+        "path": "./src/contracts/DistributorContract.sol",
+        "language": "Solidity",
+        "version": "0.5.16"
+      }
+    },
+    "info": {
+      "transaction-count": 1000,
+      "rounds": 1
+    }
+  }
+}

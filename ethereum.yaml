@@ -1,0 +1,20 @@
+caliper:
+  blockchain: ethereum
+  command:
+    start: ganache-cli
+    pre-test: null
+    test: node_modules/.bin/caliper-launcher
+    end: null
+  test:
+    name: Ethereum Benchmark
+    rounds: 1
+    sutOptions:
+      ethereum:
+        url: http://localhost:8545
+        blockDelay: 1
+        timeout: 120
+  workspace:
+    name: workspace
+    version: 1.0.0
+    description: Benchmarking Ethereum with Hyperledger Caliper
+    network: 1

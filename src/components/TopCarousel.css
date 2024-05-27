@@ -1,0 +1,15 @@
+.carousel {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.carousel-inner {
+    display: inline-block;
+    text-align: center;
+}
+
+.carousel-text {
+    margin: 0;
+}

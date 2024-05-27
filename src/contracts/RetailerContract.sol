@@ -1,0 +1,128 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.5.16;
+import "./Roles.sol";
+import "./HelperMethods.sol";
+
+contract RetailerContract {
+    Roles public rc;
+
+    constructor(address _address) public {
+        rc = Roles(_address);
+    }
+
+    struct Retailer {
+        string name;
+        string contact;
+        string hash;
+        bool isEligible;
+    }
+
+    mapping(address => Retailer) public retailers;
+    address[] public retailerAccounts;
+    address[] public unverifiedRetailerAccounts;
+
+    modifier onlyGovernmentOfficial() {
+        require(
+            rc.getRole(tx.origin) == rc.governmentID(),
+            "Only government officials can access"
+        );
+        _;
+    }
+
+    modifier onlyAuthorisedActors(address _address) {
+        require(
+            retailers[_address].isEligible == true ||
+                (HelperMethods.compareStrings(retailers[_address].hash, "") ==
+                    false &&
+                    (_address == tx.origin ||
+                        rc.getRole(tx.origin) == rc.governmentID())),
+            "Unauthorised actor"
+        );
+        _;
+    }
+
+    function addRetailer(
+        string memory _name,
+        string memory _contact,
+        string memory _hash
+    ) public {
+        Retailer storage retailer = retailers[tx.origin];
+        retailer.name = _name;
+        retailer.contact = _contact;
+        retailer.hash = _hash;
+        retailer.isEligible = false;
+
+        unverifiedRetailerAccounts.push(tx.origin);
+    }
+
+    function getRetailer(
+        address _address
+    )
+        public
+        view
+        onlyAuthorisedActors(_address)
+        returns (string memory _name, string memory _contact, bool _isEligible)
+    {
+        return (
+            retailers[_address].name,
+            retailers[_address].contact,
+            retailers[_address].isEligible
+        );
+    }
+
+    function getUnverifiedRetailerAccounts()
+        public
+        view
+        onlyGovernmentOfficial
+        returns (address[] memory)
+    {
+        return unverifiedRetailerAccounts;
+    }
+
+    function getNumUnverifiedRetailers()
+        public
+        view
+        onlyGovernmentOfficial
+        returns (uint256)
+    {
+        return unverifiedRetailerAccounts.length;
+    }
+
+    function getUnverifiedRetailer(
+        uint256 pos
+    ) public view onlyGovernmentOfficial returns (address) {
+        return unverifiedRetailerAccounts[pos];
+    }
+
+    function countRetailers() public view returns (uint256) {
+        return retailerAccounts.length;
+    }
+
+    function getNumRetailer(uint256 pos) public view returns (address) {
+        return retailerAccounts[pos];
+    }
+
+    function getHash(
+        address _address
+    ) public view onlyGovernmentOfficial returns (string memory) {
+        return retailers[_address].hash;
+    }
+
+    function setEligible(address _address) public onlyGovernmentOfficial {
+        for (uint256 i = 0; i < unverifiedRetailerAccounts.length; i++) {
+            if (unverifiedRetailerAccounts[i] == _address) {
+                unverifiedRetailerAccounts[i] = unverifiedRetailerAccounts[
+                    unverifiedRetailerAccounts.length - 1
+                ];
+                delete unverifiedRetailerAccounts[
+                    unverifiedRetailerAccounts.length - 1
+                ];
+                retailers[_address].isEligible = true;
+                rc.addRole(_address, rc.retailerRoleID());
+                unverifiedRetailerAccounts.length--;
+                retailerAccounts.push(_address);
+                break;
+            }
+        }
+    }
+}
