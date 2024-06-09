@@ -1,10 +1,10 @@
 let HDWalletProvider = require("@truffle/hdwallet-provider");
 
 //Provide your wallet private key
-let privateKey = "0a886161c0e1e93b23618e2028072822d0179647f43a43b9572bf3f626e5b6d0";
+let privateKey = "";
 
 //Provide your SKALE endpoint address
-let skale = "https://testnet.skalenodes.com/v1/giant-half-dual-testnet:974399131";
+let skale = "https://testnet.skalenodes.com/v1/giant-half-dual-testnet:12345678";
 
 module.exports = {
     networks: {
